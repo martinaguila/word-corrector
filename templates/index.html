@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Correction</title>
+</head>
+<body>
+    <h1>Code Correction</h1>
+    <form action="/submit" method="post">
+        <label for="code_input">Enter Python code to be corrected:</label><br>
+        <textarea name="code_input" rows="10" cols="40" required>{{ input_code }}</textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if corrected_code or comments %}
+        <h2>Correction Result</h2>
+        <p><strong>Original Code:</strong></p>
+        <pre>{{ input_code }}</pre>
+        <p><strong>Corrected Code:</strong></p>
+        <pre>{{ corrected_code }}</pre>
+        <p><strong>Comments:</strong></p>
+        <pre>{{ comments }}</pre>
+    {% endif %}
+</body>
+</html>
