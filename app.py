@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from openai import OpenAI
-client = OpenAI(api_key='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')
+client = OpenAI(api_key='')
 import time
 
 app = Flask(__name__)
