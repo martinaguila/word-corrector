@@ -1,26 +1,27 @@
 from flask import Flask, render_template, request
 from openai import OpenAI
 from pygments.lexers import guess_lexer
+from pygments.lexers.special import TextLexer
 
 client = OpenAI(api_key='')
 import time
 
 app = Flask(__name__)
 
-def code_auto_correction(input_code, language):
+def code_auto_correction(input_code, programming_language):
     # Check for "exit" command
     if input_code.lower().strip() == 'exit':
         return 'exit'
 
     # Generate a prompt for the OpenAI API
-    prompt = f"Correct the following {language} code:\n\n{input_code}\n\nCorrected code:"
-
+    prompt = f"Correct the following {programming_language} code:\n\n{input_code}\n\nCorrected code:"
+    # print(prompt)
     # Make a request to the OpenAI API to get corrected code
     response = client.completions.create(
         model="text-davinci-003",
         prompt=prompt,
         temperature=0.7,
-        max_tokens=150,
+        max_tokens=1000,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0
@@ -28,7 +29,7 @@ def code_auto_correction(input_code, language):
 
     # Extract corrected code from the API response
     corrected_code = response.choices[0].text
-
+    print("response",response)
     # Make a separate request to the OpenAI API to get comments
     comment_prompt = f"Provide comments on the corrections made in the code:\n\n{corrected_code}\n\nComments:"
     comments_response = client.completions.create(
@@ -53,7 +54,6 @@ def type_animation(text, delay=0.05):
         time.sleep(delay)
     print()  # Move to the next line after the animation
 
-
 @app.route('/')
 def home():
     return render_template('index.html', input_code="", corrected_code="", comments="")
@@ -62,13 +62,15 @@ def home():
 def submit():
     input_code = request.form['code_input']
 
-    # Determine the language of the code
-    language = guess_lexer(input_code).name
-    print("language",language)
-    # Your code_auto_correction function call goes here
-    corrected_code, comments = code_auto_correction(input_code, language)
+    # Determine the programming language of the code
+    lexer = guess_lexer(input_code)
+    programming_language = lexer.name if lexer else "Unknown"
+    print("programming_language", programming_language)
 
-    return render_template('index.html', input_code=input_code, corrected_code=corrected_code, comments=comments, language=language)
+    # Your code_auto_correction function call goes here
+    corrected_code, comments = code_auto_correction(input_code, programming_language)
+
+    return render_template('index.html', input_code=input_code, corrected_code=corrected_code, comments=comments, programming_language=programming_language)
 
 if __name__ == '__main__':
     app.run(debug=True)
